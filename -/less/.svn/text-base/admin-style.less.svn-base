@@ -1,0 +1,173 @@
+@import "admin-global-style.less";
+
+/******************************
+Admin Style
+*******************************/
+html,
+body{
+	height: 100%;
+	overflow: hidden;
+}
+#adminGlobalWrapper{
+	display: table;
+	width: 100%;
+	height: 100%;
+}
+#adminHeader{
+	display: table-row;
+	
+	
+	color: #fff;
+	position: relative;
+	background: #999;
+	z-index: 20;
+	
+	font-size: 18px;
+	height: 40px;
+	line-height: 40px;
+	
+	h1{
+		margin: 0;
+		font-size: 1em;
+		display: inline-block;
+		vertical-align: middle;
+		font-weight: normal;
+		text-transform: uppercase;
+		font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
+		
+		a{
+			color: inherit;
+			text-decoration: none;
+			
+			&:hover{
+				text-decoration: underline;
+			}
+		}
+	}
+}
+#expandMenu{
+	padding: 4px 0px;
+	width: 30px;
+	margin: 0 10px 0 5px;
+	font-size: 12pt;
+}
+#adminHeaderNavigation{
+	position: absolute;
+	right: 10px;
+	top: 0;
+}
+#adminContainerWrapper{
+	display: table-row;
+}
+#adminContainer{
+	height: 100%;
+	width: 100%;
+	display: table;
+	background: #444;
+	border-top: 1px solid #333;
+}
+.adminContainerCell{
+	display: table-cell;
+	height: 100%;
+	overflow: hidden;
+	vertical-align: top;
+}
+#adminMenu{
+	@width: 35px;
+
+	min-width: @width;
+	width: @width;
+	max-width: @width;
+
+	@transition : all 200ms ease-in-out;
+
+	-webkit-transition: @transition;
+	-moz-transition: @transition;
+	-ms-transition: @transition;
+	-o-transition: @transition;
+	transition: @transition;
+	
+	&.active{
+		@width: 230px;
+
+		min-width: @width;
+		width: @width;
+		max-width: @width;
+	}
+}
+#adminNavigation{
+	
+	@linkHeight : 30px;
+	text-shadow: rgba(0, 0, 0, 0.7) 0px 1px 0;
+	
+	a{
+		white-space: nowrap;
+		display: block;
+		border-top: 1px solid #555;
+		border-bottom: 1px solid #333;
+		position: relative;
+		line-height: @linkHeight;
+		
+		text-decoration: none;
+		color: #aaa;
+		
+		.icon{
+			width: 30px;
+			margin-right: 5px;
+		}
+		
+		&:hover{
+			background: #585858;
+			color: #ddd;
+		}
+		
+	}
+	.active{
+		background: #666;
+		color: #ddd;
+		
+		&:after{
+			content: '';
+			position: absolute;
+			top: 0;
+			right: 0;
+			border: transparent @linkHeight/2 solid;
+			border-left-width: 0;
+			border-right-width: @linkHeight/4;
+			border-right-color: #ddd;
+			z-index: 11;
+		}
+	}
+}
+#signature{
+	position: absolute;
+	bottom: 10px;
+	color: #999;
+	text-decoration: none;
+	font-size: 9pt;
+	text-shadow: #000 0px 0px 5px;
+	
+	.icon{
+		font-size: 16pt;
+		width: 30px;
+		margin-right: 5px;
+
+	}
+	
+	&:hover{
+		color: #ddd;
+	}
+}
+#adminIframeContainer{
+	background: #ddd;
+	padding-left: 10px;
+	position: relative;
+	z-index: 10;
+	box-shadow: -2px 0 3px rgba(0,0,0,0.5);
+}
+#globalIframe{
+	height: 100%;
+	width: 100%;
+	background: transparent;
+	border: none;
+}

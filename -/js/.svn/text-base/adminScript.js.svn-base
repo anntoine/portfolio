@@ -1,0 +1,219 @@
+(function( $ ){
+	
+	var methods = {
+		init : function( options ) {
+			
+			return this.each(function(){
+				
+				var $this = $(this),
+					data = $this.data('popUp'),
+					popUp = $('<div />', {
+						text : $this.attr('title')
+					});
+
+				// If the plugin hasn't been initialized yet
+				if ( ! data ) {
+					
+					$this.data('popUp', {
+					   target : $this
+					});
+					
+					$this.click(function(){	
+						$this.popUp('closePopUp');		
+					});
+					$('.closePopUp', $this).click(function(){
+						$this.popUp('closePopUp');
+					});
+					
+					
+					$('.popUpContent', $this).click(function(evt){
+						evt.stopPropagation();
+					});
+					
+				}
+			});
+		},
+		openPopUp : function(){
+			return this.each(function(){
+				
+				var $this = $(this);
+				
+				//special case for an iframe popUp
+				if($this.hasClass('popUpAjax') && $('.popUpContent', $this).is(':empty')){
+					$.ajax({
+						url : $this.attr('data-src'),
+						success : function(data){
+							$('.popUpContent', $this).append(data);
+						}
+					});
+					//$this.append('<iframe class="popUpContent" src="' + $this.attr('data-iframesrc') + '"></iframe>');
+				}
+				if($this.hasClass('popUpIframe') && $('.popUpContent', $this).is(':empty')){
+					$this.empty().append('<iframe class="popUpContent" src="' + $this.attr('data-src') + '"></iframe>')
+				}
+				
+				$this.addClass('active');
+				
+				$('body').css({'margin-right': '15px', 'overflow': 'hidden'});
+				
+			});
+		},
+		closePopUp : function(){
+			return this.each(function(){
+				
+				var $this = $(this);
+				
+				$this.removeClass('active');
+				
+				$('body').css({'margin-right': '0', 'overflow': 'auto'});
+				
+			});
+		},
+		destroy : function(){
+			return this.each(function(){
+				var $this = $(this),
+					data = $this.data('popUp');
+
+				// Namespacing FTW
+				$(window).unbind('.popUp');
+				data.popUp.remove();
+				$this.removeData('popUp');
+			})
+		}
+	};
+
+	$.fn.popUp = function( method ) {
+
+		// Method calling logic
+		if ( methods[method] ) {
+			return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+		} else if ( typeof method === 'object' || ! method ) {
+			return methods.init.apply( this, arguments );
+		} else {
+			$.error( 'Method ' +  method + ' does not exist on jQuery.popUp' );
+		}    
+
+	};
+
+})( jQuery );
+
+
+$(document).ready(function(){
+	
+	/**************************
+	Url management
+	***************************/
+	//get the current page url
+	if(window.location == window.parent.location){
+		//main view
+		var hash = window.location.hash;
+		var mainView = null;
+		var iframeSrc = null;
+		
+		if(!hash){
+			//the main view
+			mainView = $('#adminNavigation > a').first();
+			iframeSrc = mainView.attr('href');
+		}else{
+			hash = hash.substring(1);
+			//console.log(hash);
+			//we remove the get argument from the url to target the good menu item
+			var href = hash.split('?');
+			mainView = $('#adminNavigation > a[href="' + href[0] + '"]');
+			iframeSrc = hash;
+		}
+		//set the interface correctly
+		//the menu's link
+		mainView.addClass('active');
+		//the iframe url
+		$('#globalIframe').attr('src', iframeSrc);
+		
+	}else{
+		//iframe view, at each load we change the hash
+		var iframeLocation = window.location.pathname + window.location.search;
+		
+		window.parent.location.hash = iframeLocation;
+	}
+
+	/**
+	Expand or retract the main menu
+	**/
+	$('#adminNavigation a').click(function(){
+		$('#adminNavigation .active').removeClass('active');
+		$(this).addClass('active');
+	});
+	
+	$('#expandMenu').toggle(function(){
+		$('#adminMenu').addClass('active');
+	}, function(){
+		$('#adminMenu').removeClass('active');
+	});
+	
+	
+	$('.popUp').popUp();
+	/**
+	Display a popUp in the main iframe
+	the buttons to display the popUp must be like :
+	<input type="button" class="popUpButton" data-popup="popUp-id"/>
+	where the attribute data-popup is the id of the popUp
+	**/
+	$('.popUpButton').click(function(){
+		var popUpId = $(this).attr('data-popup');
+		var popUp = $('#' + popUpId);
+		
+		//if the popUp is found
+		if(popUpId && popUp.length){
+			popUp.popUp('openPopUp');
+		}else{
+			console.log(popUpId + 'popUp not found');
+		}
+	});
+	
+	
+	
+	/**
+	preview an image thanks to its url
+	the html structure for this implementation need to be like
+	<div class="previewImageFormAdmin">
+		<input type="url"/>
+		<input type="submit"/>
+		<div class="containerPreviewedImage"></div>
+	</div>
+	**/
+	$('.previewButtonFromAdmin').click(function(evt){
+		//get the container
+		var mainContainer = $(this).parent('.previewImageFormAdmin');
+		
+		//get the input url before
+		var inputUrl = $('input[type="url"]', mainContainer);
+		//get the url
+		var urlImg = inputUrl.attr('value');
+		//get the container after
+		var containerPreview = $('.containerPreviewedImageFormAdmin', mainContainer);
+
+		//empty the container for the preview and add the image
+		containerPreview.empty().append('<img src="'+urlImg+'" alt=""/>');
+		
+	});
+	
+	try{
+		//add a rich text editor
+		$('textarea.tinymce').tinymce({
+			// Location of TinyMCE script
+			script_url : '/-/js/libs/tiny_mce/tiny_mce.js',
+			theme : 'advanced',
+			plugins : 'paste',
+			theme_advanced_blockformats : 'p,div,h2,h3,h4,blockquote,dt,dd,code',
+			paste_auto_cleanup_on_paste : true,
+			paste_remove_styles: true,
+			paste_remove_styles_if_webkit: true,
+			paste_strip_class_attributes: true,
+			relative_urls : false,
+			external_image_list_url : "/admin-app/media-library/tinymce-images-list"
+		});
+	}catch(err){
+		console.log(err);
+	}
+	
+	
+});

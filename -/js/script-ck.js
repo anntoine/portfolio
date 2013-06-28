@@ -1,0 +1,3 @@
+/* Author:
+	Maggie Nuudles
+*/$(document).ready(function(){function e(){$header=$("#main-header");if($(window).scrollTop()>0){$header.addClass("floating");console.log($(window).scrollTop())}else $header.removeClass("floating")}function t(){var e=$("#intro .intro-wrapper"),t=$(window).height(),n=e.find("#main-heading").outerHeight(!0)+e.find("#feature-logo-wrapper").outerHeight(!0);$(window).scrollTop()>0?e.css({height:n}):e.css({height:t,"min-height":n})}e();t();$(window).resize(function(){t()});$(window).scroll(function(){e();t()})});
